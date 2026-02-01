@@ -1,13 +1,10 @@
 const Staff = require('../model/staffModel');
 const db = require('../config/db');
 
-// Función auxiliar para buscar horarios alternativos
 async function buscarAlternativas(fecha, habilidadRequerida) {
-    // Definimos bloques de horario laboral (08:00 a 19:00)
     const bloquesPosibles = ["08:00", "09:30", "11:00", "12:30", "14:00", "15:30", "17:00"];
     const sugerencias = [];
 
-    // Obtenemos personal con la habilidad necesaria
     const personalApto = await Staff.findBySkill(habilidadRequerida);
 
     for (const hora of bloquesPosibles) {
@@ -46,8 +43,14 @@ exports.asignarYCrearCita = async (req, res) => {
         const [serv] = await db.query('SELECT categoria FROM servicios WHERE id = ?', [servicio_id]);
         if (serv.length === 0) return res.status(404).json({ error: "Servicio no encontrado" });
         
-        const habilidadRequerida = (serv[0].categoria === 'Corte' || serv[0].categoria === 'Tinte' || serv[0].categoria === 'Peinado') 
-                                    ? 'Estilista' : 'Ayudante';
+        const categoria = serv[0].categoria;
+
+        let habilidadRequerida = 'Ayudante';
+        const serviciosCabello = ['Corte', 'Tinte', 'Peinado', 'Planchado'];
+        
+        if (serviciosCabello.includes(categoria)) {
+            habilidadRequerida = 'Estilista';
+        }
 
         const candidatos = await Staff.findBySkill(habilidadRequerida);
         
@@ -94,7 +97,11 @@ exports.asignarYCrearCita = async (req, res) => {
         res.status(201).json({ 
             success: true, 
             message: "Cita confirmada exitosamente.",
-            trabajador_id: trabajadorElegido 
+            detalles: {
+                fecha: fecha,
+                hora: hora_inicio,
+                trabajador_id: trabajadorElegido 
+            }
         });
 
     } catch (error) {
