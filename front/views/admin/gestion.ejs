@@ -1,15 +1,18 @@
 <%- include('../partials/header') %>
 
+    <button type="" class="btn btn-dark w-20" style="align-items: center; margin-left: auto; margin-right: auto;"><a href="/admin/reporte"  style="text-decoration: none; color: white;">Ver citas del día</a></button>
 <div class="container py-4">
-    <h2 class="fw-bold mb-4">Panel de Administración</h2>
-
+    <h2 class="fw-bold mb-4">Panel de Administración</h2>    
     <div class="row">
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h5>Registrar nuevo empleado</h5>
                     <form id="formEmpleado">
-                        <input type="number" id="usuario_id" class="form-control mb-2" placeholder="ID del Usuario" required>
+                        <label>Seleccionar Empleado:</label>
+                        <select id="select-empleado" class="form-control">
+                            <option value="">Cargando usuarios...</option>
+                        </select>
                         <select id="habilidad" class="form-select mb-2">
                             <option value="Estilista">Estilista</option>
                             <option value="Ayudante">Ayudante</option>

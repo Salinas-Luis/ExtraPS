@@ -18,7 +18,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         localStorage.setItem('usuario', JSON.stringify(result.user));
         
         if (result.user.rol === 1) {
-            window.location.href = '/admin/dashboard';
+            window.location.href = '/admin/gestion';
         } else if (result.user.rol === 2) {
             window.location.href = '/cliente/dashboard';
         } else {

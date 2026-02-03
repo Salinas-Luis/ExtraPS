@@ -63,7 +63,6 @@ function seleccionarServicio(elemento, id, nombre, precio, duracion) {
 
     elemento.classList.add('border-primary', 'border-2', 'bg-light');
 
-    // Guardar datos en la variable global
     servicioSeleccionado = { id, nombre, precio, duracion };
     
     const inputId = document.getElementById('servicio_id');

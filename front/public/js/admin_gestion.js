@@ -3,7 +3,7 @@ document.getElementById('formEmpleado').addEventListener('submit', async (e) => 
     e.preventDefault();
     
     const data = {
-        usuario_id: document.getElementById('usuario_id').value,
+        usuario_id: document.getElementById('select-empleado').value,
         habilidad: document.getElementById('habilidad').value
     };
 
@@ -44,3 +44,45 @@ document.getElementById('formAusencia').addEventListener('submit', async (e) => 
         alert("Error al registrar la ausencia.");
     }
 });
+
+document.querySelector('.btn-danger').addEventListener('click', async () => {
+    const data = {
+        trabajador_id: document.querySelector('input[placeholder="6"]').value, 
+        fecha: document.querySelector('input[type="date"]').value,
+        motivo: document.querySelector('input[placeholder="xd"]').value
+    };
+
+    const response = await fetch('/api/admin/ausencias', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    alert(result.mensaje || result.error);
+});
+async function llenarListaUsuarios() {
+    try {
+        const res = await fetch('/api/admin/lista-clientes');
+        
+        if (!res.ok) {
+            throw new Error('Error en la respuesta del servidor');
+        }
+
+        const usuarios = await res.json();
+        const select = document.getElementById('select-empleado');
+
+        if (Array.isArray(usuarios)) {
+            select.innerHTML = usuarios.map(u => 
+                `<option value="${u.id}">${u.nombre_completo}</option>`
+            ).join('');
+        } else {
+            select.innerHTML = '<option value="">No hay clientes disponibles</option>';
+        }
+    } catch (error) {
+        console.error("Fallo al cargar la lista:", error);
+        document.getElementById('select-empleado').innerHTML = '<option value="">Error al cargar</option>';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', llenarListaUsuarios);

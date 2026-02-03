@@ -1,58 +1,73 @@
-
 async function generarReporte() {
-    const fechaInput = document.getElementById('fechaReporte');
+    const fecha = document.getElementById('fechaReporte').value;
     const tabla = document.getElementById('tabla-reporte');
-    
-    if (!fechaInput.value) return;
+
+    if (!fecha) {
+        alert("Por favor, selecciona una fecha válida.");
+        return;
+    }
 
     try {
-        const response = await fetch(`/api/admin/dashboard-general?fecha=${fechaInput.value}`);
-        
-        if (!response.ok) {
-            throw new Error('Error al obtener los datos del servidor');
-        }
-
+        const response = await fetch(`/api/admin/tablero-citas?fecha=${fecha}`);
         const citas = await response.json();
 
-        tabla.innerHTML = '';
+        tabla.innerHTML = ""; 
 
         if (citas.length === 0) {
-            tabla.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No hay citas registradas para este día.</td></tr>';
+            tabla.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No hay citas registradas para este día.</td></tr>`;
             return;
         }
 
-        citas.forEach(c => {
-            const fila = `
-                <tr>
-                    <td><strong>${c.hora_inicio} - ${c.hora_fin}</strong></td>
-                    <td>${c.cliente}</td>
-                    <td>${c.servicio}</td>
-                    <td>
-                        <span class="badge bg-secondary">${c.tipo_personal}</span> 
-                        ${c.trabajador}
-                    </td>
-                    <td>
-                        <span class="badge ${obtenerColorEstado(c.estado)}">${c.estado}</span>
-                    </td>
-                </tr>
-            `;
+        citas.forEach(cita => {
+const fila = `
+                    <tr>
+                        <td>${cita.hora_inicio}</td>
+                        <td>${cita.cliente}</td>
+                        <td>${cita.servicio}</td>
+                        <td>${cita.atendido_por}</td>
+                        <td><span class="badge bg-success">${cita.estado}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-warning" onclick="abrirModalReasignar(${cita.cita_id})">Reasignar</button>
+                            <button class="btn btn-sm btn-danger" onclick="confirmarCancelacion(${cita.cita_id})">Cancelar</button>
+                        </td>
+                    </tr>
+                `;
             tabla.innerHTML += fila;
         });
     } catch (error) {
-        console.error("Error en el reporte:", error);
-        alert("No se pudo cargar el reporte diario.");
+        console.error("Error al obtener el reporte:", error);
+        tabla.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Error al cargar los datos.</td></tr>`;
     }
 }
 
-function obtenerColorEstado(estado) {
-    const colores = {
-        'Confirmada': 'bg-primary',
-        'En Curso': 'bg-info',
-        'Completada': 'bg-success',
-        'No Show': 'bg-danger',
-        'Cancelada': 'bg-secondary'
-    };
-    return colores[estado] || 'bg-dark';
+async function confirmarCancelacion(id) {
+    if (confirm("¿Estás seguro de cancelar esta cita por contingencia?")) {
+        const res = await fetch(`/api/admin/cancelar-cita/${id}`, { method: 'PUT' });
+        const data = await res.json();
+        if (data.success) {
+            alert(data.mensaje);
+            generarReporte(); 
+        }
+    }
 }
 
+function abrirModalReasignar(id) {
+    const nuevoId = prompt("Ingresa el ID del nuevo personal (ver tabla de personal):");
+    if (nuevoId) {
+        ejecutarReasignacion(id, nuevoId);
+    }
+}
+
+async function ejecutarReasignacion(citaId, trabajadorId) {
+    const res = await fetch('/api/admin/reasignar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cita_id: citaId, nuevo_trabajador_id: trabajadorId })
+    });
+    const data = await res.json();
+    if (data.success) {
+        alert(data.mensaje);
+        generarReporte();
+    }
+}
 document.addEventListener('DOMContentLoaded', generarReporte);
