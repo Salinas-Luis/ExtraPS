@@ -19,6 +19,23 @@ const User = {
         `;
         const [rows] = await db.query(query, [correo]);
         return rows[0]; 
+    },
+    updateRol: async (usuario_id, nuevo_rol) => {
+        try {
+            const query = 'UPDATE usuarios SET rol_id = ? WHERE id = ?';
+            await db.query(query, [nuevo_rol, usuario_id]);
+            return true;
+        } catch (error) {
+            throw error;
+        }
+    },
+obtenerClientes: async () => {
+        try {
+            const [rows] = await db.query('SELECT id, nombre_completo FROM usuarios WHERE rol_id = 2');
+            return rows;
+        } catch (error) {
+            throw error;
+        }
     }
 };
 

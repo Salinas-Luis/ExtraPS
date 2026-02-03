@@ -1,5 +1,6 @@
 const Admin = require('../model/adminModel');
 const db = require('../config/db'); 
+const User = require('../model/userModel');
 
 const sanitizeHTML = (str) => str && typeof str === 'string' ? str.replace(/<[^>]*>?/gm, '').trim() : str;
 
@@ -16,54 +17,97 @@ exports.registrarEmpleado = async (req, res) => {
         await Admin.createStaff(usuario_id, habilidad);
         res.status(201).json({ success: true, message: "Personal dado de alta correctamente." });
     } catch (error) {
-        res.status(500).json({ error: "Error al registrar personal: " + error.message });
+        res.status(500).json({ error: "Error al registrar personal: " });
     }
 };
 
 exports.registrarFalta = async (req, res) => {
-    let { trabajador_id, fecha, motivo } = req.body;
-
-    if (!trabajador_id || !fecha) {
-        return res.status(400).json({ error: "Se requiere el ID del trabajador y la fecha de la falta." });
-    }
-
-    const motivoLimpio = sanitizeHTML(motivo) || "Sin motivo especificado";
-    const fechaLimpia = sanitizeHTML(fecha);
-
     try {
-        await Admin.createAbsence(trabajador_id, fechaLimpia, motivoLimpio);
-        res.status(201).json({ success: true, message: "Ausencia programada exitosamente." });
+        const { trabajador_id, fecha, motivo } = req.body;
+        if (!trabajador_id || !fecha) {
+            return res.status(400).json({ error: "Falta el ID del trabajador o la fecha." });
+        }
+        const [empleado] = await db.query('SELECT id FROM personal WHERE id = ?', [trabajador_id]);
+        if (empleado.length === 0) {
+            return res.status(404).json({ error: "El ID de personal no existe." });
+        }
+        const query = 'INSERT INTO ausencias (trabajador_id, fecha, motivo) VALUES (?, ?, ?)';
+        await db.query(query, [trabajador_id, fecha, motivo]);
+
+        res.json({ mensaje: "Ausencia registrada con éxito. El trabajador no recibirá citas ese día." });
     } catch (error) {
-        res.status(500).json({ error: "Error al registrar la ausencia." });
+        console.error(error);
+        res.status(500).json({ error: "No se pudo registrar la ausencia." });
     }
 };
 
-exports.obtenerTodasLasCitas = async (req, res) => {
-    let { fecha } = req.query; 
-
-    if (!fecha) {
-        return res.status(400).json({ error: "Debes proporcionar una fecha para generar el reporte." });
-    }
-
-    fecha = sanitizeHTML(fecha);
-
+exports.obtenerTableroCitas = async (req, res) => {
     try {
+        const { fecha } = req.query; 
+
+        const filtroFecha = fecha ? '?' : 'CURDATE()';
+
         const query = `
-            SELECT c.id, u.nombre_completo AS cliente, p.habilidad AS tipo_personal,
-                   per_u.nombre_completo AS trabajador, s.nombre AS servicio,
-                   c.hora_inicio, c.hora_fin, c.estado
+            SELECT 
+                c.id AS cita_id,
+                u_cliente.nombre_completo AS cliente,
+                s.nombre AS servicio,
+                u_staff.nombre_completo AS atendido_por,
+                c.hora_inicio,
+                c.hora_fin,
+                c.estado
             FROM citas c
-            JOIN usuarios u ON c.cliente_id = u.id
-            JOIN personal p ON c.trabajador_id = p.id
-            JOIN usuarios per_u ON p.usuario_id = per_u.id
+            JOIN usuarios u_cliente ON c.cliente_id = u_cliente.id
             JOIN servicios s ON c.servicio_id = s.id
-            WHERE c.fecha = ?
+            JOIN personal p ON c.trabajador_id = p.id
+            JOIN usuarios u_staff ON p.usuario_id = u_staff.id
+            WHERE c.fecha = ${filtroFecha}
             ORDER BY c.hora_inicio ASC
         `;
-        const [reporte] = await db.query(query, [fecha]);
 
-        res.json(reporte);
+        const [rows] = await db.query(query, fecha ? [fecha] : []);
+        res.json(rows);
     } catch (error) {
-        res.status(500).json({ error: "Error al obtener el reporte global: " + error.message });
+        console.error("Error en el reporte:", error);
+        res.status(500).json({ error: "Error al cargar el tablero de citas." });
+    }
+};
+exports.cancelarCitaAdmin = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await db.query("UPDATE citas SET estado = 'Cancelada' WHERE id = ?", [id]);
+        res.json({ success: true, mensaje: "Cita cancelada correctamente." });
+    } catch (error) {
+        res.status(500).json({ error: "Error al cancelar la cita." });
+    }
+};
+
+exports.reasignarPersonal = async (req, res) => {
+    try {
+        const { cita_id, nuevo_trabajador_id } = req.body;
+        await db.query("UPDATE citas SET trabajador_id = ? WHERE id = ?", [nuevo_trabajador_id, cita_id]);
+        res.json({ success: true, mensaje: "Personal reasignado con éxito." });
+    } catch (error) {
+        res.status(500).json({ error: "Error al reasignar personal." });
+    }
+};
+exports.obtenerListaClientes = async (req, res) => {
+    try {
+        const clientes = await User.obtenerClientes();
+        res.json(clientes);
+    } catch (error) {
+        res.status(500).json({ error: "Error al obtener clientes" });
+    }
+};
+
+exports.promoverAPersonal = async (req, res) => {
+    try {
+        const { usuario_id, habilidad } = req.body;
+        await db.query('UPDATE usuarios SET rol_id = 3 WHERE id = ?', [usuario_id]);
+        await db.query('INSERT INTO personal (usuario_id, habilidad, esta_activo) VALUES (?, ?, 1)', [usuario_id, habilidad]);
+        
+        res.json({ success: true, mensaje: "¡Usuario promovido a personal!" });
+    } catch (error) {
+        res.status(500).json({ error: "Error en la promoción" });
     }
 };

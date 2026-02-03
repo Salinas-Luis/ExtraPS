@@ -24,9 +24,12 @@ app.get('/cliente/agendar', (req, res) => res.render('cliente/agendar'));
 app.get('/', (req, res) => res.render('index'));
 app.get('/personal/agenda', (req, res) => res.render('personal/agenda')); 
 app.get('/admin/reporte', (req, res) => res.render('admin/reporte'));
+app.get('/admin/gestion', (req, res) => res.render('admin/gestion'));
 app.get('/cliente/dashboard', (req, res) => res.render('cliente/dashboard'));
 
 const PORT = process.env.PORT || 3000;
+
+
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en: http://localhost:${PORT}`);
 });
