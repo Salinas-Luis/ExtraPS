@@ -1,14 +1,28 @@
 
 document.getElementById('fechaFiltro').addEventListener('change', cargarAgenda);
 
+document.addEventListener('DOMContentLoaded', async () => {
+if (!localStorage.getItem('usuario')) {
+        window.location.href = '/login';
+    }
+});
 async function cargarAgenda() {
     const usuario = JSON.parse(localStorage.getItem('usuario'));
     const fecha = document.getElementById('fechaFiltro').value;
     const tabla = document.getElementById('tabla-agenda');
+    
 
     const response = await fetch(`/api/staff/mi-agenda?trabajador_id=${usuario.id}&fecha=${fecha}`);
     const citas = await response.json();
-
+            if (!citas || citas.length === 0) {
+            tabla.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4">
+                        No hay citas programadas para esta fecha.
+                    </td>
+                </tr>`;
+            return;
+        }
     tabla.innerHTML = '';
     citas.forEach(cita => {
         tabla.innerHTML += `

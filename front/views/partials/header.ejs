@@ -16,16 +16,30 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/login">Iniciar Sesión</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link btn btn-primary text-white px-3 ms-lg-2" href="/register">Registrarse</a>
-                </li>
+            <ul class="navbar-nav ms-auto align-items-center">
+                <div id="guest-nav" class="d-flex">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">Iniciar Sesión</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary text-white px-3 ms-lg-2" href="/register">Registrarse</a>
+                    </li>
+                </div>
+
+                <div id="user-nav" class="d-none d-flex align-items-center">
+                    <li class="nav-item">
+                        <span id="userName" class="me-3 text-light" style="display: inline-block; margin-top: 0px;"></span>
+                    </li>
+                    <li class="nav-item">
+                        <button onclick="cerrarSesion()" class="btn btn-outline-danger btn-sm">
+                            Salir
+                        </button>
+                    </li>
+                </div>
             </ul>
         </div>
     </div>
 </nav>
-
+<script src="/js/logout.js"></script>
+<script src="/js/header.js"></script>
 <div class="container mt-4">

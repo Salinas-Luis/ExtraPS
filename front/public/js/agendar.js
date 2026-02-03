@@ -1,8 +1,9 @@
-// front/public/js/agendar.js
 
 document.addEventListener('DOMContentLoaded', async () => {
     const listaServicios = document.getElementById('lista-servicios');
-
+    if (!localStorage.getItem('usuario')) {
+            window.location.href = '/login';
+        }
     try {
         const response = await fetch('/api/services');
         const servicios = await response.json();

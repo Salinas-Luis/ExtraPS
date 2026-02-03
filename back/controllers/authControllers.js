@@ -28,7 +28,7 @@ exports.register = async (req, res) => {
             nombre_completo: nombreLimpio, 
             correo: correoLimpio, 
             telefono: telefonoLimpio, 
-            contrasena: contrasena, 
+            password: contrasena, 
             rol_id: 2 
         });
 

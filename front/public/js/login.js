@@ -3,7 +3,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     
     const data = {
         correo: document.getElementById('correo').value,
-        contrasena: document.getElementById('password').value
+        password: document.getElementById('password').value
     };
 
     const response = await fetch('/api/auth/login', {
@@ -13,13 +13,13 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     });
 
     const result = await response.json();
-
+    console.log(result.user)
     if (response.ok) {
         localStorage.setItem('usuario', JSON.stringify(result.user));
         
-        if (result.user.rol_id === 1) {
+        if (result.user.rol === 1) {
             window.location.href = '/admin/dashboard';
-        } else if (result.user.rol_id === 2) {
+        } else if (result.user.rol === 2) {
             window.location.href = '/cliente/dashboard';
         } else {
             window.location.href = '/personal/agenda';
