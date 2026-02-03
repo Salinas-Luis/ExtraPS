@@ -1,0 +1,33 @@
+<%- include('../partials/header') %>
+
+<div class="container py-4">
+    <h2 class="fw-bold mb-4">Reporte Diario de Operaciones</h2>
+    
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body d-flex align-items-center">
+            <span class="me-3 fw-bold text-muted">Consultar fecha:</span>
+            <input type="date" id="fechaReporte" class="form-control w-auto" value="<%= new Date().toISOString().split('T')[0] %>">
+            <button onclick="generarReporte()" class="btn btn-primary ms-3">Actualizar</button>
+        </div>
+    </div>
+
+    <div class="table-responsive bg-white rounded shadow-sm">
+        <table class="table table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Hora</th>
+                    <th>Cliente</th>
+                    <th>Servicio</th>
+                    <th>Personal Asignado</th>
+                    <th>Estatus</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-reporte">
+                </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="/js/admin_reporte.js"></script>
+
+<%- include('../partials/footer') %>

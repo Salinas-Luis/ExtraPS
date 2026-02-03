@@ -1,26 +1,51 @@
 const Admin = require('../model/adminModel');
+const db = require('../config/db'); 
+
+const sanitizeHTML = (str) => str && typeof str === 'string' ? str.replace(/<[^>]*>?/gm, '').trim() : str;
 
 exports.registrarEmpleado = async (req, res) => {
-    const { usuario_id, habilidad } = req.body;
+    let { usuario_id, habilidad } = req.body;
+
+    if (!usuario_id || !habilidad) {
+        return res.status(400).json({ error: "El ID de usuario y la habilidad son obligatorios." });
+    }
+
+    habilidad = sanitizeHTML(habilidad);
+
     try {
         await Admin.createStaff(usuario_id, habilidad);
         res.status(201).json({ success: true, message: "Personal dado de alta correctamente." });
     } catch (error) {
-        res.status(500).json({ error: "Error al registrar personal." });
+        res.status(500).json({ error: "Error al registrar personal: " + error.message });
     }
 };
 
 exports.registrarFalta = async (req, res) => {
-    const { trabajador_id, fecha, motivo } = req.body;
+    let { trabajador_id, fecha, motivo } = req.body;
+
+    if (!trabajador_id || !fecha) {
+        return res.status(400).json({ error: "Se requiere el ID del trabajador y la fecha de la falta." });
+    }
+
+    const motivoLimpio = sanitizeHTML(motivo) || "Sin motivo especificado";
+    const fechaLimpia = sanitizeHTML(fecha);
+
     try {
-        await Admin.createAbsence(trabajador_id, fecha, motivo);
+        await Admin.createAbsence(trabajador_id, fechaLimpia, motivoLimpio);
         res.status(201).json({ success: true, message: "Ausencia programada exitosamente." });
     } catch (error) {
         res.status(500).json({ error: "Error al registrar la ausencia." });
     }
 };
+
 exports.obtenerTodasLasCitas = async (req, res) => {
-    const { fecha } = req.query; 
+    let { fecha } = req.query; 
+
+    if (!fecha) {
+        return res.status(400).json({ error: "Debes proporcionar una fecha para generar el reporte." });
+    }
+
+    fecha = sanitizeHTML(fecha);
 
     try {
         const query = `
@@ -39,6 +64,6 @@ exports.obtenerTodasLasCitas = async (req, res) => {
 
         res.json(reporte);
     } catch (error) {
-        res.status(500).json({ error: "Error al obtener el reporte global." });
+        res.status(500).json({ error: "Error al obtener el reporte global: " + error.message });
     }
 };

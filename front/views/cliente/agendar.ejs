@@ -1,0 +1,46 @@
+<%- include('../partials/header') %>
+
+<div class="container py-5">
+    <h2 class="text-center mb-4 fw-bold">Agendar Nueva Cita</h2>
+    <p class="text-center text-muted mb-5">Selecciona el servicio que deseas y elige tu horario.</p>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div id="lista-servicios" class="row g-4">
+                </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Detalles de la Cita</h5>
+                    <form id="appointmentForm">
+                        <input type="hidden" id="servicio_id">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Fecha</label>
+                            <input type="date" id="fecha" class="form-control" required>
+                            <small class="text-muted">Lunes a Viernes únicamente</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Hora de Inicio</label>
+                            <input type="time" id="hora_inicio" class="form-control" min="08:00" max="18:00" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2 mt-3" id="btnAgendar" disabled>
+                            Confirmar Cita
+                        </button>
+                    </form>
+                    <div id="sugerencias-container" class="mt-4 d-none">
+                        <h6>Horarios disponibles:</h6>
+                        <div id="lista-sugerencias" class="list-group"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/agendar.js"></script>
+<%- include('../partials/footer') %>

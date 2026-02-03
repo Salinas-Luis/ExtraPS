@@ -1,16 +1,38 @@
 const User = require('../model/userModel');
 
+
+const sanitizeHTML = (str) => str ? str.replace(/<[^>]*>?/gm, '') : ''; 
+const sanitizeNumbers = (str) => str ? str.replace(/\D/g, '') : '';
+
 exports.register = async (req, res) => {
-    const { nombre_completo, correo, telefono, password } = req.body;
-    if (!nombre_completo || !correo || !telefono || !contrasena) {
-        return res.status(400).json({ error: "Todos los campos son obligatorios para el registro." });
+    let { nombre_completo, correo, telefono, contrasena } = req.body;
+
+    const nombreLimpio = sanitizeHTML(nombre_completo).trim();
+    const correoLimpio = sanitizeHTML(correo).trim();
+    const telefonoLimpio = sanitizeNumbers(telefono);
+
+    if (!nombreLimpio || !correoLimpio || !telefonoLimpio || !contrasena) {
+        return res.status(400).json({ error: "Todos los campos son obligatorios y deben ser válidos." });
     }
-    if (!correo.includes('@')) {
+
+    if (!correoLimpio.includes('@')) {
         return res.status(400).json({ error: "El formato del correo no es válido." });
     }
+
+    if (telefonoLimpio.length < 8) {
+        return res.status(400).json({ error: "El teléfono debe tener al menos 8 dígitos." });
+    }
+
     try {
-        await User.create({ nombre_completo, correo, telefono, password, rol_id: 2 });
-        res.status(201).json({ success: true, message: "Registro exitoso" });
+        await User.create({ 
+            nombre_completo: nombreLimpio, 
+            correo: correoLimpio, 
+            telefono: telefonoLimpio, 
+            contrasena: contrasena, 
+            rol_id: 2 
+        });
+
+        res.status(201).json({ success: true, message: "Registro exitoso y seguro." });
     } catch (error) {
         res.status(500).json({ error: "Error al registrar: " + error.message });
     }
@@ -33,3 +55,4 @@ exports.login = async (req, res) => {
         res.status(500).json({ error: "Error en el login" });
     }
 };
+

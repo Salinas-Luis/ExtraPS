@@ -1,6 +1,9 @@
 const Staff = require('../model/staffModel');
 const db = require('../config/db');
 
+const sanitizeHTML = (str) => str ? str.replace(/<[^>]*>?/gm, '') : ''; 
+const sanitizeNumbers = (str) => str ? str.replace(/\D/g, '') : '';
+
 async function buscarAlternativas(fecha, habilidadRequerida) {
     const bloquesPosibles = ["08:00", "09:30", "11:00", "12:30", "14:00", "15:30", "17:00"];
     const sugerencias = [];
@@ -37,7 +40,13 @@ function calcularHoraFinTemporal(inicio, minutos) {
 }
 
 exports.asignarYCrearCita = async (req, res) => {
-    const { cliente_id, servicio_id, fecha, hora_inicio, hora_fin } = req.body;
+    
+    let { cliente_id, servicio_id, fecha, hora_inicio, hora_fin } = req.body;
+
+    fecha = sanitizeHTML(fecha);
+    hora_inicio = sanitizeHTML(hora_inicio);
+    hora_fin = sanitizeHTML(hora_fin);
+
     if (!cliente_id || !servicio_id || !fecha || !hora_inicio || !hora_fin) {
         return res.status(400).json({ error: "Faltan datos necesarios para agendar la cita." });
     }

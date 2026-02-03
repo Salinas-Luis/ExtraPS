@@ -1,0 +1,40 @@
+<%- include('../partials/header') %>
+
+<div class="container py-4">
+    <h2 class="fw-bold mb-4">Panel de Administración</h2>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Registrar nuevo empleado</h5>
+                    <form id="formEmpleado">
+                        <input type="number" id="usuario_id" class="form-control mb-2" placeholder="ID del Usuario" required>
+                        <select id="habilidad" class="form-select mb-2">
+                            <option value="Estilista">Estilista</option>
+                            <option value="Ayudante">Ayudante</option>
+                        </select>
+                        <button type="submit" class="btn btn-dark w-100">Dar de Alta</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Registrar Falta/Ausencia</h5>
+                    <form id="formAusencia">
+                        <input type="number" id="trabajador_id" class="form-control mb-2" placeholder="ID del Trabajador" required>
+                        <input type="date" id="fechaFalta" class="form-control mb-2" required>
+                        <input type="text" id="motivo" class="form-control mb-2" placeholder="Motivo (Salud, Personal...)">
+                        <button type="submit" class="btn btn-danger w-100">Bloquear Fecha</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/admin_gestion.js"></script>
+<%- include('../partials/footer') %>
