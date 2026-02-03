@@ -6,41 +6,59 @@
 
     <div class="row">
         <div class="col-lg-8">
+            <h5 class="fw-bold mb-4">1. Elige un tipo de servicio:</h5>
             <div id="lista-servicios" class="row g-4">
-                </div>
+                <p class="text-muted">Cargando servicios...</p>
+            </div>
         </div>
 
         <div class="col-lg-4">
             <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
                 <div class="card-body">
                     <h5 class="fw-bold mb-3">Detalles de la Cita</h5>
+                    
+                    <div id="resumen-seleccion" class="mb-3 d-none">
+                        <div class="alert alert-info py-2 small">
+                            <strong>Seleccionado:</strong> <span id="nombre-servicio-resumen"></span>
+                        </div>
+                    </div>
+
                     <form id="appointmentForm">
-                        <input type="hidden" id="servicio_id">
+                        <input type="hidden" id="servicio_id" name="servicio_id" required>
                         
                         <div class="mb-3">
-                            <label class="form-label">Fecha</label>
+                            <label class="form-label fw-semibold">Fecha</label>
                             <input type="date" id="fecha" class="form-control" required>
-                            <small class="text-muted">Lunes a Viernes únicamente</small>
+                            <small class="text-muted d-block mt-1">Lunes a Viernes únicamente</small>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Hora de Inicio</label>
+                            <label class="form-label fw-semibold">Hora de Inicio</label>
                             <input type="time" id="hora_inicio" class="form-control" min="08:00" max="18:00" required>
+                            <small class="text-muted">Horario: 08:00 AM - 07:00 PM</small>
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100 fw-bold py-2 mt-3" id="btnAgendar" disabled>
                             Confirmar Cita
                         </button>
                     </form>
-                    <div id="sugerencias-container" class="mt-4 d-none">
-                        <h6>Horarios disponibles:</h6>
-                        <div id="lista-sugerencias" class="list-group"></div>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .service-card {
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent !important;
+    }
+    .service-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+</style>
 
 <script src="/js/agendar.js"></script>
 <%- include('../partials/footer') %>
