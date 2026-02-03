@@ -38,7 +38,9 @@ function calcularHoraFinTemporal(inicio, minutos) {
 
 exports.asignarYCrearCita = async (req, res) => {
     const { cliente_id, servicio_id, fecha, hora_inicio, hora_fin } = req.body;
-
+    if (!cliente_id || !servicio_id || !fecha || !hora_inicio || !hora_fin) {
+        return res.status(400).json({ error: "Faltan datos necesarios para agendar la cita." });
+    }
     try {
         const [serv] = await db.query('SELECT categoria FROM servicios WHERE id = ?', [servicio_id]);
         if (serv.length === 0) return res.status(404).json({ error: "Servicio no encontrado" });

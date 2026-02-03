@@ -2,6 +2,12 @@ const User = require('../model/userModel');
 
 exports.register = async (req, res) => {
     const { nombre_completo, correo, telefono, password } = req.body;
+    if (!nombre_completo || !correo || !telefono || !contrasena) {
+        return res.status(400).json({ error: "Todos los campos son obligatorios para el registro." });
+    }
+    if (!correo.includes('@')) {
+        return res.status(400).json({ error: "El formato del correo no es válido." });
+    }
     try {
         await User.create({ nombre_completo, correo, telefono, password, rol_id: 2 });
         res.status(201).json({ success: true, message: "Registro exitoso" });
