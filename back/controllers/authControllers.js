@@ -22,6 +22,12 @@ exports.register = async (req, res) => {
     if (telefonoLimpio.length < 8) {
         return res.status(400).json({ error: "El teléfono debe tener al menos 8 dígitos." });
     }
+    if (contrasena.length < 8) {
+    return res.status(400).json({ error: "La contraseña debe tener al menos 8 dígitos." });
+    }
+    if (nombreLimpio.length < 3) {
+    return res.status(400).json({ error: "El nombre debe tener al menos 3 dígitos." });
+    }
 
     try {
         await User.create({ 
@@ -40,6 +46,12 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
     const { correo, password } = req.body;
+        if(!correo){
+            return res.status(400).json({error:"Rellene el campo de correo" })
+        }
+        if(!password){
+            return res.status(400).json({error:"Rellene el campo de contraseña" })
+        }
     try {
         const user = await User.findByEmail(correo);
 

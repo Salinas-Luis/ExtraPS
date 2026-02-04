@@ -4,7 +4,12 @@ const Appointment = require('../model/appointmentModel');
 exports.validarCita = async (req, res, next) => {
     console.log("== PASO 1: ENTRANDO AL VALIDADOR ==");
     const { cliente_id, servicio_id, fecha, hora_inicio } = req.body;
-
+        if (!fecha) {
+            return res.status(400).json({ error: "Escoga una fecha de Lunes a Viernes" });
+        }
+        if (!hora_inicio) {
+            return res.status(400).json({ error: "Escoga una hora de 8:00am a 19:00pm" });
+        }
     try {
         const fechaObj = new Date(fecha.replace(/-/g, '\/')); 
         if (fechaObj.getDay() === 0 || fechaObj.getDay() === 6) {
