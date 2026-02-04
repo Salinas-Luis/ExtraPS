@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
 citas.forEach(cita => {
-    // Limpiamos la fecha si viene con el formato T06:00:00
     const fechaLimpia = cita.fecha.split('T')[0];
 
     contenedor.innerHTML += `
